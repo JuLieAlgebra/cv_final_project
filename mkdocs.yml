@@ -1,0 +1,30 @@
+site_name: final-project
+repo_url: https://github.com/juliealgebra/final-project
+site_url: https://juliealgebra.github.io/final-project
+site_description: Final project for sp2022
+site_author: Julieanna Bacon
+
+nav:
+  - Home: index.md
+  - Modules: modules.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+            setup_commands:
+                - import sys
+                - sys.path.append('../')
+copyright: Maintained by Julieanna Bacon.
+theme:
+  name: material
+  feature:
+    tabs: true
+  palette:
+    primary: white
+    accent: blue
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
