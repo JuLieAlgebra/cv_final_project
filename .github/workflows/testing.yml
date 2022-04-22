@@ -1,0 +1,30 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Testing with Pytest
+
+on: [push]
+
+jobs:
+  test:
+    name: Pytest
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pipenv
+        pipenv install --dev --deploy
+    - name: Test with pytest
+      run: |
+        pipenv run pytest --cov-report xml --cov-report term
+    - name: CodeClimate Coverage
+      uses: paambaati/codeclimate-action@v2.7.5
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CODE_COVERAGE }}
+      with:
+        coverageLocations: ${{github.workspace}}/coverage.xml:coverage.py
