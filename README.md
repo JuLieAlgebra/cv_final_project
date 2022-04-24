@@ -1,4 +1,4 @@
-# Final Project
+# Final Project: Estimating Astronomical Distances via Photos
 
 [![Release](https://img.shields.io/github/v/release/fpgmaas/cookiecutter-poetry-example)](https://img.shields.io/github/v/release/fpgmaas/cookiecutter-poetry-example)
 
@@ -15,6 +15,8 @@
 <!-- [![License](https://img.shields.io/github/license/fpgmaas/cookiecutter-poetry-example)](https://img.shields.io/github/license/fpgmaas/cookiecutter-poetry-example)
  -->
 Final project for sp2022
+
+Photometric redshift pipeline with, primarily, luigi and tensorflow.
 
 - **Github repository**: <https://github.com/fpgmaas/cookiecutter-poetry-example/>
 - **Documentation** <https://fpgmaas.github.io/cookiecutter-poetry-example/>

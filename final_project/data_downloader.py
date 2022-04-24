@@ -1,7 +1,9 @@
 import os
 from contextlib import contextmanager
+from typing import ContextManager
 
 import luigi
+import pandas as pd
 
 
 class CSV(luigi.Task):
@@ -13,8 +15,7 @@ class CSV(luigi.Task):
 
 
 class URlgenerator(luigi.Task):
-    url_filename = "urls.txt"
-    df = pd.read_csv(self.inputs().path)  # ??
+    url_filename = luigi.Parameter(default="data/urls.txt")
 
     def requires(self):
         """Requres luigi Target of downloaded csv tabular data"""
@@ -23,10 +24,11 @@ class URlgenerator(luigi.Task):
 
     def output(self):
         """Outputs formatted urls for downloading"""
-        return luigi.LocalTarget("data/urls.text")  # ??
+        return luigi.LocalTarget(self.url_filename)  # ??
 
     def run(self):
         """ """
+        df = pd.read_csv(self.inputs().path)
         urls = []
         bands = ["u", "g", "r", "i", "z"]
         for i, row in self.df.iterrows():
@@ -36,29 +38,33 @@ class URlgenerator(luigi.Task):
                             {row.rerun}/{row.run}/{row.camcol}/frame-{band}-{str(row.run).zfill(6)}\
                             -{row.camcol}-{str(row.field).zfill(4)}.fits.bz2"
                 )
+        print("Success: Generated URLs")
 
-        with open(self.url_filename, mode="w") as f:
+        with self.output().open(mode='w') as f:
             for u in urls:
                 f.write(u)
 
 
 class Downloader(luigi.Task):
-    url_input = self.input()
-    file_names = self.get_filenames(url_input)  # something like that for url
+    # url_input = self.input()
+    # file_names = self.get_filenames(url_input)  # something like that for url
 
     def requires(self):
         return URlgenerator()
 
     def output(self):
         """Right now this would do every single 50k image"""
-        return [file for file in self.files]
+        return {url: luigi.LocalTarget(url[url.find("frame"):])
+                for url in self.inputs()}
 
     @contextmanager
-    def download(self, stuff):
-        tmp = "tmp.fits.bz2"
+    def download(self, url) -> ContextManager:
+        tmp = f"{hash(url)}.fits.bz2"
+        file_name = url[url.find("frame"):]
         try:
-            os.system(f"wget -O {tmp} {urls[0]}")
-            os.system(f"mv tmp.fits.bz2 frame-u-000756-2-0626.fits.bz2")
+            os.system(f"wget -O data/{tmp} {urls[0]}")
+            os.system(f"mv data/{tmp} data/{file_name}")
+            yield file_name
         # except WhateverExceptionIexpect:
         # alert me that it happened
         finally:
@@ -66,7 +72,8 @@ class Downloader(luigi.Task):
                 os.remove(tmp)
 
     def run(self):
-        """ """
-        for file in self.files:
-            with download(file) as d:
-                pass
+        """ Downloads and moves the images from the SDSS atomically """
+        with self.inputs().open('r') as urls:
+            for url in urls:
+                with download(url) as d:
+                    print(f"Success: {d}")

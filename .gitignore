@@ -1,5 +1,7 @@
 docs/source
 data
+# Ignoring my personal notes on TODO's
+project_todo.txt
 
 # From https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore
 

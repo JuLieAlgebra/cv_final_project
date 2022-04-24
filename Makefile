@@ -1,6 +1,6 @@
 install: ## Install the poetry environment
 	@echo "🚀 Creating virtual environment using pyenv and poetry"
-	@poetry install	
+	@poetry install
 	@poetry shell
 
 format: ## Format code using isort and black.
