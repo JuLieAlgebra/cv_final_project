@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest = "*"
+pytest-cov = "*"
+black = "*"
+isort = "*"
+mkdocs = "*"
+mkdocs-material = "*"
+mkdocstrings = "*"
+
+[packages]
+pandas = "*"
+astropy = "*"
+luigi = "*"
+hydra-core = "*"
+#luigi[toml] for stuff
+pipfile = "*"
+
+[requires]
+python_version = "3.8"

@@ -21,16 +21,6 @@ Photometric redshift pipeline with, primarily, luigi and tensorflow.
 - **Github repository**: <https://github.com/fpgmaas/cookiecutter-poetry-example/>
 - **Documentation** <https://fpgmaas.github.io/cookiecutter-poetry-example/>
 
-## Releasing a new version
-
-- Create an API Token on [Pypi](https://pypi.org/).
-- Add the API Token to your projects secrets with the name `PYPI_TOKEN` by visiting 
-[this page](https://github.com/juliealgebra/final-project/settings/secrets/actions/new).
-- Create a [new release](https://github.com/juliealgebra/final-project/releases/new) on Github. 
-Create a new tag in the form ``*.*.*``.
-
-For more details, see [here](https://fpgmaas.github.io/cookiecutter-poetry/releasing.html).
-
 ---
 
 Repository initiated with [fpgmaas/cookiecutter-poetry](https://github.com/fpgmaas/cookiecutter-poetry).
