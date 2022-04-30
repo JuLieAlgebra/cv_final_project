@@ -1,0 +1,3 @@
+tabular_dir: s3://photometric-redshift/tabular-data/
+tabular_data: SDSS_tabular_data.csv
+validation_dir: s3://photometric-redshift/validation_data/
