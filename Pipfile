@@ -11,6 +11,7 @@ isort = "*"
 mkdocs = "*"
 mkdocs-material = "*"
 mkdocstrings = "*"
+pre-commit = "*"
 
 [packages]
 pandas = "*"

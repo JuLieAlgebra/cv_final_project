@@ -1,25 +1,32 @@
 import luigi
 import keras
-import hydra
+import omegaconf
 
 from final_project import preprocessing
+from final_project import salted
 
 
-@hydra.config("cfg/training") # something like that
 class TrainModel(luigi.Task):
-    salt = pass
-
-    def __init__(self):
-        pass
+    params = omegaconf.OmegaConf.load("final_project/conf/train.yaml")
+    lr = luigi.Parameter(params["lr"])
+    ...  # some repeated code in order to have the parameters become part of the salt
+    model = Model(params)
 
     def train(self):
-        pass
+        self.model.train()  # ish.
 
     def predict(self):
         pass
 
     def requires(self):
-        return preprocessing.GenTrainData()
+        return  # preprocessing.GenTrainData()
 
     def output(self):
-        return luigi.LocalTarget(f'model_{self.salt}.something')
+        """trained model with checkpoints....."""
+        return salted.SaltedOutput(self.__class__.__name__)  # something like this
+
+
+class Model:
+    def __init__(self, params: dict):
+        ...
+        # params = omegaconf.OmegaConf.load("final_project/conf/train.yaml")
