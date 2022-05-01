@@ -18,6 +18,7 @@ pandas = "*"
 astropy = "*"
 luigi = "*"
 hydra-core = "*"
+boto3 = "*"
 #luigi[toml] for stuff
 pipfile = "*"
 
