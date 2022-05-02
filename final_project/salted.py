@@ -2,12 +2,15 @@ from luigi import LocalTarget
 
 
 class SaltedOutput:
+    """ """
+
     def __init__(
         self,
         file_pattern="{task.__class__.__name__}-{file}{salt}{self.ext}",
         ext=".csv",
         target_class=LocalTarget,
-        file="" ** target_kwargs,
+        file="",
+        **target_kwargs,
     ):
         file_pattern = file_pattern.format(salt=self.get_salted_version())
         self.file = file  # file is string of reg output

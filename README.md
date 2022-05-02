@@ -19,8 +19,8 @@ Final project for sp2022
 Photometric redshift pipeline with, primarily, luigi and tensorflow.
 
 Note: For downloading the tabular data, I recommend adding a `.env` file with your AWS secrets like so:
-``AWS_ACCESS_KEY_ID=something
-AWS_SECRET_ACCESS_KEY=something``
+``AWS_ACCESS_KEY_ID=something``
+``AWS_SECRET_ACCESS_KEY=something``
 
 The downloaded data is 2.2MB, so very small and will likely not cost anything.
 
