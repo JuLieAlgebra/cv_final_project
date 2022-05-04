@@ -14,11 +14,11 @@ class Preprocessing(luigi.Task):
     """Takes the zipped image files and ends up with the finish, saved datacubes in .npy format"""
 
     # Grabs the tabular data's name, want to be agnostic to future changes to that file
-    tabular_path = omegaconf.OmegaConf.load("final_project/conf/aws_paths")["tabular_data"]
+    tabular_path = omegaconf.OmegaConf.load("final_project/conf/aws_paths.yaml")["tabular_data"]
 
-    # Parameters for kicking off the requires tasks (which should also run in parallel)
-    n_workers = luigi.Parameter(default=10)
-    n_urls = luigi.Parameter(default=50000)
+    # # Parameters for kicking off the requires tasks (which should also run in parallel)
+    # n_workers = luigi.Parameter(default=10)
+    # n_urls = luigi.Parameter(default=50000)
 
     # range of downloaded files to process = [lower, upper]
     lower = luigi.IntParameter()
@@ -30,11 +30,14 @@ class Preprocessing(luigi.Task):
 
     def requires(self) -> list:
         """Hopefully runs the downloader in parallel if I kick off the final task properly"""
+        # TODO ACTually, need this to kick off only the downloader for the lower & upper range of this
+        # task. The next task will kick off all of the parallelization.
 
-        chunk = self.n_urls // self.n_workers
-        assert self.n_urls % self.n_workers == 0  # if this isn't an integer, I want an error
+        # chunk = self.n_urls // self.n_workers
+        # assert self.n_urls % self.n_workers == 0  # if this isn't an integer, I want an error
+        # #[data_downloader.ImageDownloader(lower=i, upper=i + chunk) for i in range(0, self.n_urls, chunk)]
 
-        return [data_downloader.ImageDownloader(lower=i, upper=i + chunk) for i in range(0, self.n_urls, chunk)]
+        return data_downloader.ImageDownloader(lower=self.lower, upper=self.upper)
 
     def run(self):
         """Big workhorse."""
@@ -64,6 +67,7 @@ class GenTrainTestData(luigi.Task):
     SPLIT = 0.8  # fraction of dataset that is trained on
 
     def output(self):
+        # Oh not going to work, outputs are entire directories? Need to resolve. Also with the Salted stuff...
         paths = ...
         return {"test": luigi.LocalTarget(self.test_directory), "train": luigi.LocalTarget(self.train_directory)}
 

@@ -1,6 +1,7 @@
 from unittest import TestCase
 import numpy as np
 import luigi
+import os
 
 from final_project import data_downloader
 
@@ -15,7 +16,7 @@ class DownloaderTests(TestCase):
     def test_check_urls(self, n_urls=15445):
         """Need to adjust, there won't be 50000 unique urls, only 15,445"""
         urls = np.genfromtxt("data/urls.txt", dtype=str)
-        assert len(np.unique(urls)[0]) == n_urls
+        assert np.unique(urls).shape[0] == n_urls
 
     def test_check_downloaded(self):
         not_downloaded = "data/not_downloaded.txt"

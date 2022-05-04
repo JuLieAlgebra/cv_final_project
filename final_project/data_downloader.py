@@ -45,7 +45,6 @@ class URLgenerator(luigi.Task):
 
     def requires(self):
         """Requres luigi Target of downloaded csv tabular data"""
-        # csv target
         return TabularDownloader()
 
     def output(self):
@@ -93,10 +92,7 @@ class ImageDownloader(luigi.Task):
         return URLgenerator()
 
     def output(self):
-        """Right now this would do every single 50k image"""
-        # Not sure...............................
-        # return {url: luigi.LocalTarget(url[url.find("frame"):])
-        #         for url in self.input()}
+        """Success file with range of files"""
         return luigi.LocalTarget(f"data/images/_SUCCESS{self.lower}-{self.upper}")
 
     @contextmanager

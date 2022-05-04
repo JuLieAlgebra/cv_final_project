@@ -4,10 +4,11 @@ import zipfile
 import luigi
 import pandas as pd
 import astropy
+import numpy as np
 
 
 def get_data_cube(observation: pd.Series) -> np.ndarray:
-    """Big, big workhorse. Takes in a row of the tabular data corresponding to one observation"""
+    """Workhorse. Takes in a row of the tabular data corresponding to one observation"""
 
     bands = ["u", "g", "r", "i", "z"]
     files = []
@@ -69,7 +70,7 @@ def galactic_coord_to_pixel(observation: pd.Series, fits: str) -> tuple:
     # make sure this is actually a context manager
     with astropy.io.fits.open(fits) as hdulist:
         # do stuff
-        header = hdulist[0]
+        header = hdulist[0].header
         wcs = astropy.wcs.WCS(header)
         coord = SkyCoord(ra=observation.ra, dec=observation.dec)
         target = astropy.wcs.utils.skycoord_to_pixel(coord, wcs)
@@ -80,14 +81,14 @@ def galactic_coord_to_pixel(observation: pd.Series, fits: str) -> tuple:
 ###====================================================###
 
 
-class FITSLocalTarget(luigi.LocalTarget):
-    hdulist
+# class FITSLocalTarget(luigi.LocalTarget):
+#     hdulist
 
-    @contextmanager
-    def open(self, mode="r", **kwargs):
-        # data = hdulist[0].data.copy()
-        try:
-            hdulist = astropy.io.fits.open(filename)
-            yield hdulist
-        finally:
-            hdulist.close()
+#     @contextmanager
+#     def open(self, mode="r", **kwargs):
+#         # data = hdulist[0].data.copy()
+#         try:
+#             hdulist = astropy.io.fits.open(filename)
+#             yield hdulist
+#         finally:
+#             hdulist.close()
