@@ -22,7 +22,7 @@ Note: For downloading the tabular data, I recommend adding a `.env` file with yo
 ``AWS_ACCESS_KEY_ID=something``
 ``AWS_SECRET_ACCESS_KEY=something``
 
-The downloaded data is 2.2MB, so very small and will likely not cost anything.
+The downloaded tabular data is 2.2MB.
 
 The SQL query used to grab the data via CasJobs:
 ```sql

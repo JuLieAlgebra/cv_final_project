@@ -12,8 +12,14 @@ def main():
     chunk = n_urls // n_workers
     assert n_urls % n_workers == 0  # if this isn't an integer, I want an error
 
+    # luigi.build(
+    #     [data_downloader.ImageDownloader(lower=i, upper=i + chunk) for i in range(0, n_urls, chunk)],
+    #     local_scheduler=True,
+    #     workers=n_workers,
+    # )
+
     luigi.build(
-        [data_downloader.ImageDownloader(lower=i, upper=i + chunk) for i in range(0, n_urls, chunk)],
+        [preprocessing.Preprocessing(lower=i // 5, upper=i // 5 + chunk) for i in range(0, n_urls // 5, chunk // 5)],
         local_scheduler=True,
         workers=n_workers,
     )

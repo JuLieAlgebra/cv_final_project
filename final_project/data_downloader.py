@@ -12,6 +12,8 @@ import pandas as pd
 class SavedS3(luigi.ExternalTask):
     """Luigi Task to point to S3 target"""
 
+    __version__ = "0.1.0"
+
     paths = omegaconf.OmegaConf.load("final_project/conf/aws_paths.yaml")
     data = luigi.Parameter(default="tabular")
 
@@ -22,6 +24,8 @@ class SavedS3(luigi.ExternalTask):
 
 class TabularDownloader(luigi.Task):
     """Luigi Task to download S3 target"""
+
+    __version__ = "0.1.0"
 
     tabular_data = omegaconf.OmegaConf.load("final_project/conf/aws_paths.yaml")["tabular_data"]
     csv_path = f"data/{tabular_data}"
@@ -41,6 +45,9 @@ class TabularDownloader(luigi.Task):
 
 
 class URLgenerator(luigi.Task):
+    """TODO docs"""
+
+    __version__ = "0.1.0"
     url_filename = luigi.Parameter(default="data/urls.txt")
 
     def requires(self):
@@ -49,7 +56,7 @@ class URLgenerator(luigi.Task):
 
     def output(self):
         """Outputs formatted urls for downloading"""
-        return luigi.LocalTarget(self.url_filename)  # ??
+        return luigi.LocalTarget(self.url_filename)
 
     def run(self):
         """Generates the URLs"""
@@ -84,6 +91,8 @@ class ImageDownloader(luigi.Task):
             workers=n_workers)
     """
 
+    __version__ = "0.1.0"
+
     # range of downloaded files = [lower, upper]
     lower = luigi.IntParameter()
     upper = luigi.IntParameter()
@@ -117,7 +126,7 @@ class ImageDownloader(luigi.Task):
                 os.system(f"mv data/images/{tmp} data/images/{file_name}")
                 yield file_name
         finally:
-            # Cleanup, if tmp stil
+            # Cleanup, if tmp still exists
             if os.path.exists(tmp):
                 os.remove(tmp)
 
@@ -125,7 +134,6 @@ class ImageDownloader(luigi.Task):
         """Downloads and moves the images from the SDSS atomically"""
         with self.input().open("r") as urls:
             for i, url in enumerate(urls):
-                # Ugly, want to redo, but functional
                 # only downloads the section of urls that have been passed in
                 # as Luigi parameter
                 if i >= self.lower and i <= self.upper:
