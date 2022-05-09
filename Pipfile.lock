@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "bc302b7e36e7a977afe2667671ed2d19d6cdf5cf6e7b5b778746baa9da948fc5"
+            "sha256": "0f40a4ad2cd430eab3a21bfa3b0efe4366e378efef600c45e88ec550e0218fd9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,12 @@
         ]
     },
     "default": {
+        "antlr4-python3-runtime": {
+            "hashes": [
+                "sha256:15793f5d0512a372b4e7d2284058ad32ce7dd27126b105fb0b2245130445db33"
+            ],
+            "version": "==4.8"
+        },
         "astropy": {
             "hashes": [
                 "sha256:001184f1a9c3f526a363883ce28efb9cbf076df3d151ca3e131509a248f0dfb9",
@@ -215,8 +221,16 @@
                 "sha256:fade0d4f4d292b6f39951b6836d7a3c7ef5b2347f3c420cd9820a1d90d794802",
                 "sha256:fdf3c08bce27132395d3c3ba1503cac12e17282358cb4bddc25cc46b0aca07aa"
             ],
-            "markers": "python_version < '3.10' and platform_machine != 'aarch64' and platform_machine != 'arm64'",
+            "markers": "python_version >= '3.8'",
             "version": "==1.22.3"
+        },
+        "omegaconf": {
+            "hashes": [
+                "sha256:2ae9cbbc1105991da5301b7a0ac8b960958c311239bb2dfd4e3f5e60d2a51029",
+                "sha256:35b347cda95e8ced224179a7059c216b1f38f363812847bd6c856be76936151d"
+            ],
+            "index": "pypi",
+            "version": "==2.1.2"
         },
         "packaging": {
             "hashes": [

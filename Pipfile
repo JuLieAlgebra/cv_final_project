@@ -19,6 +19,7 @@ astropy = "*"
 luigi = "*"
 boto3 = "*"
 matplotlib = "*"
+omegaconf = "*"
 
 [requires]
 python_version = "3.8"
