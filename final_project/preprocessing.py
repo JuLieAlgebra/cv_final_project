@@ -40,10 +40,10 @@ class Preprocessing(luigi.Task):
 
         for i, observation in rows.iterrows():
             data_cube = preprocessing_utils.get_data_cube(observation)
-            file_name = os.path.join(self.processed_path, f"{observation.id}-{salted.get_salted_version(self)}.npy")
+            file_name = os.path.join(self.processed_path, f"{observation.objID}-{salted.get_salted_version(self)}.npy")
 
             # can I improve this?
-            data_cube.save(file_name)
+            np.save(file=file_name, arr=data_cube)
 
         # writing the success file
         with self.output().open("w") as outfile:

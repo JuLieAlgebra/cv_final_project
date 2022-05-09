@@ -7,8 +7,8 @@ from final_project import data_downloader, preprocessing, salted, preprocessing_
 def main():
     #########################################################
 
-    n_workers = 10
-    n_urls = 50000
+    n_workers = 2
+    n_urls = 10
     chunk = n_urls // n_workers
     assert n_urls % n_workers == 0  # if this isn't an integer, I want an error
 

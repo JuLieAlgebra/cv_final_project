@@ -17,10 +17,8 @@ pre-commit = "*"
 pandas = "*"
 astropy = "*"
 luigi = "*"
-hydra-core = "*"
 boto3 = "*"
-#luigi[toml] for stuff
-pipfile = "*"
+matplotlib = "*"
 
 [requires]
 python_version = "3.8"

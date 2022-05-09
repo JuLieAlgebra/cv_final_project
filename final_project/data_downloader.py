@@ -1,12 +1,18 @@
 import os
 from contextlib import contextmanager
 from typing import ContextManager
+import bz2
 
 import omegaconf
 import luigi
 from luigi.contrib.s3 import S3Target
 import numpy as np
 import pandas as pd
+import astropy.io.fits
+
+
+class FailedImageCheck(OSError):
+    pass
 
 
 class SavedS3(luigi.ExternalTask):
@@ -104,8 +110,9 @@ class ImageDownloader(luigi.Task):
         """Success file with range of files"""
         return luigi.LocalTarget(f"data/images/_SUCCESS{self.lower}-{self.upper}")
 
-    @contextmanager
-    def download(self, url) -> ContextManager:
+    @classmethod
+    @contextmanager  #test this
+    def download(cls, url) -> ContextManager:
         """Context manager for downloading FITS images from the SDSS"""
 
         # Generating temporary and final file names
@@ -126,9 +133,40 @@ class ImageDownloader(luigi.Task):
                 os.system(f"mv data/images/{tmp} data/images/{file_name}")
                 yield file_name
         finally:
+            # If it doesn't exist, then something went wrong downloading and we're
+            # going to delete the temp.
+            if os.path.exists(f"data/images/{file_name}"):
+                # check image
+                if cls.bad_file(file_name):
+                    os.remove(f"data/images/{file_name}")
+                    print("Got a bad one: ", file_name)
+                    cls.download(url)
+
             # Cleanup, if tmp still exists
             if os.path.exists(tmp):
                 os.remove(tmp)
+
+            if not os.path.exists(f"data/images/{file_name}"):
+                # didn't download, try again
+                # TODO need to write a breakout for this recursion in case it just
+                #      can't do it
+                print("Trying again")
+                cls.download(url)
+
+    @classmethod
+    def bad_file(cls, file_name: str) -> bool:
+        """ Using astropy's file checking to make sure the files didn't
+        get corrupted.
+        TODO removed hard coded paths here."""
+        path = f"data/images/{file_name}"
+        try:
+            with bz2.BZ2File(path, "rb") as file:
+                with astropy.io.fits.open(path) as hdulist:
+                    return False
+        except OSError:
+            return True
+        # if we've gotten here.... something happened
+        raise FailedImageCheck(f"What happened?: {file_name}")
 
     def run(self):
         """Downloads and moves the images from the SDSS atomically"""
