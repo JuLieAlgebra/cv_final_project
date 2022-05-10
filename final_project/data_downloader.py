@@ -111,7 +111,7 @@ class ImageDownloader(luigi.Task):
         return luigi.LocalTarget(f"data/images/_SUCCESS{self.lower}-{self.upper}")
 
     @classmethod
-    @contextmanager  #test this
+    @contextmanager  # test this
     def download(cls, url) -> ContextManager:
         """Context manager for downloading FITS images from the SDSS"""
 
@@ -133,14 +133,14 @@ class ImageDownloader(luigi.Task):
                 os.system(f"mv data/images/{tmp} data/images/{file_name}")
                 yield file_name
         finally:
-            # If it doesn't exist, then something went wrong downloading and we're
-            # going to delete the temp.
-            if os.path.exists(f"data/images/{file_name}"):
-                # check image
-                if cls.bad_file(file_name):
-                    os.remove(f"data/images/{file_name}")
-                    print("Got a bad one: ", file_name)
-                    cls.download(url)
+            # # If it doesn't exist, then something went wrong downloading and we're
+            # # going to delete the temp.
+            # if os.path.exists(f"data/images/{file_name}"):
+            #     # check image
+            #     if cls.bad_file(file_name):
+            #         os.remove(f"data/images/{file_name}")
+            #         print("Got a bad one: ", file_name)
+            #         cls.download(url)
 
             # Cleanup, if tmp still exists
             if os.path.exists(tmp):
@@ -155,7 +155,7 @@ class ImageDownloader(luigi.Task):
 
     @classmethod
     def bad_file(cls, file_name: str) -> bool:
-        """ Using astropy's file checking to make sure the files didn't
+        """Using astropy's file checking to make sure the files didn't
         get corrupted.
         TODO removed hard coded paths here."""
         path = f"data/images/{file_name}"

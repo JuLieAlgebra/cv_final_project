@@ -1,5 +1,6 @@
 import os
 import zipfile
+import glob
 
 import luigi
 import numpy as np
@@ -39,11 +40,26 @@ class Preprocessing(luigi.Task):
         rows = df.iloc[self.lower : self.upper]
 
         for i, observation in rows.iterrows():
-            data_cube = preprocessing_utils.get_data_cube(observation)
             file_name = os.path.join(self.processed_path, f"{observation.objID}-{salted.get_salted_version(self)}.npy")
 
-            # can I improve this?
-            np.save(file=file_name, arr=data_cube)
+            try:
+                with open(f"debug/debugging{self.lower}-{self.upper}.txt", mode="w") as debug:
+                    debug.write(f"{i}\n")
+                    # print("CHecking file exists for: ", glob.glob(file_name[:-15]+"*"), " +++ ", file_name[:-15])
+                    if glob.glob(file_name[:-15] + "*") == []:
+                        data_cube = preprocessing_utils.get_data_cube(observation)
+
+                        # can I improve this?
+                        np.save(file=file_name, arr=data_cube)
+                        print("Done with ", file_name)
+                    else:
+                        print("Already finished: ", file_name)
+            except FileNotFoundError:
+                with open(f"debug/log_file{self.lower}.txt", mode="w") as log:
+                    log.write(file_name + "----" + str(i) + "\n")
+            except OSError:
+                with open(f"debug/bad_data{self.lower}.txt", mode="w") as log:
+                    log.write(file_name + "----" + str(i) + "\n")
 
         # writing the success file
         with self.output().open("w") as outfile:

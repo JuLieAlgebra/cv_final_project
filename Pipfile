@@ -8,9 +8,7 @@ pytest = "*"
 pytest-cov = "*"
 black = "*"
 isort = "*"
-mkdocs = "*"
-mkdocs-material = "*"
-mkdocstrings = "*"
+sphinx = "*"
 pre-commit = "*"
 
 [packages]
@@ -20,6 +18,7 @@ luigi = "*"
 boto3 = "*"
 matplotlib = "*"
 omegaconf = "*"
+sphinx = "*"
 
 [requires]
 python_version = "3.8"
