@@ -7,7 +7,7 @@ from final_project import data_downloader, preprocessing, salted, preprocessing_
 def main():
     #########################################################
 
-    n_workers = 12
+    n_workers = 14
     n_urls = 50000
     n_obj = 10000
     chunk_url = n_urls // n_workers
@@ -36,10 +36,6 @@ def main():
     )
 
     ########################################################
-
-    # task = data_downloader.Downloader
-    # for param_name, param in sorted(task.get_params()):
-    #     print(param_name, param._default)
 
 
 #     luigi.build(

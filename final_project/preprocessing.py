@@ -24,7 +24,7 @@ class Preprocessing(luigi.Task):
     # Grabs the tabular data's name, want to be agnostic to future changes to that file
     tabular_path = omegaconf.OmegaConf.load(join(abs_path, "conf", "aws_paths.yaml"))["tabular_data"]
     local_paths = omegaconf.OmegaConf.load(join(abs_path, "conf", "local_paths.yaml"))
-    processed_path = join(abs_path, local_paths["data"], local_paths["processed"])
+    processed_path = join(abs_path, "..", local_paths["data"], local_paths["processed"])
 
     # range of downloaded files to process = [lower, upper]
     lower = luigi.IntParameter()
@@ -32,7 +32,7 @@ class Preprocessing(luigi.Task):
 
     def output(self) -> luigi.LocalTarget:
         return luigi.LocalTarget(
-            join(abs_path, self.processed_path, f"_SUCCESS{self.lower}-{self.upper}-{salted.get_salted_version(self)}")
+            join(self.processed_path, f"_SUCCESS{self.lower}-{self.upper}-{salted.get_salted_version(self)}")
         )
 
     def requires(self) -> list:
@@ -40,32 +40,34 @@ class Preprocessing(luigi.Task):
 
     def run(self):
         """Big workhorse."""
-        df = pd.read_csv(join(abs_path, self.local_paths["data"], self.tabular_path))
+        df = pd.read_csv(join(abs_path, "..", self.local_paths["data"], self.tabular_path))
         rows = df.iloc[self.lower : self.upper]
+        logs = ""
 
         for i, observation in rows.iterrows():
-            file_name = join(
-                abs_path, self.processed_path, f"{observation.objID}-{salted.get_salted_version(self)}.npy"
-            )
+            file_name = join(self.processed_path, f"{observation.objID}-{salted.get_salted_version(self)}.npy")
 
             try:
-                with open(f"debug/debugging{self.lower}-{self.upper}.txt", mode="w") as debug:
-                    debug.write(f"{i}\n")
-                    # print("CHecking file exists for: ", glob.glob(file_name[:-15]+"*"), " +++ ", file_name[:-15])
-                    if glob.glob(file_name[:-15] + "*") == []:
-                        data_cube = preprocessing_utils.get_data_cube(observation)
-
-                        # can I improve this?
-                        np.save(file=file_name, arr=data_cube)
-                        print("Done with ", file_name)
-                    else:
-                        print("Already finished: ", file_name)
+                print(i)  # trying to debug something....
+                # creating an account...
+                logs = logs + "\n" + str(i)
+                if glob.glob(file_name[:-15] + "*") == []:
+                    data_cube = preprocessing_utils.get_data_cube(observation)
+                    # can I improve this?
+                    np.save(file=file_name, arr=data_cube)
+                    print("Done with ", file_name)
+                else:
+                    print("Already finished: ", file_name)
             except FileNotFoundError:
                 with open(f"debug/log_file{self.lower}.txt", mode="w") as log:
                     log.write(file_name + "----" + str(i) + "\n")
             except OSError:
                 with open(f"debug/bad_data{self.lower}.txt", mode="w") as log:
                     log.write(file_name + "----" + str(i) + "\n")
+
+        # writing the log file
+        with open(f"debug/debugging{self.lower}-{self.upper}.txt", mode="w") as debug:
+            debug.write(logs)
 
         # writing the success file
         with self.output().open("w") as outfile:

@@ -6,7 +6,7 @@
 Welcome to Photometric Redshifts's documentation!
 =================================================
 
-For project intro, please click here: :ref:`project_intro`
+For project intro, please click here: :ref:`project-intro`
 
 .. toctree::
    :maxdepth: 2
