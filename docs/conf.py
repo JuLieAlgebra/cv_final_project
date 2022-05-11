@@ -14,12 +14,7 @@ import sphinx_rtd_theme
 import os
 import sys
 
-print(sys.path)
-print()
-# sys.path.append(os.path.abspath('../final_project'))
-sys.path.insert(0, os.path.abspath(".."))  # os.path.join('..', 'final_project')))
-print(sys.path)
-print()
+sys.path.insert(0, os.path.abspath(".."))
 
 
 # -- Project information -----------------------------------------------------

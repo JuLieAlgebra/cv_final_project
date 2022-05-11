@@ -6,6 +6,8 @@
 Welcome to Photometric Redshifts's documentation!
 =================================================
 
+For project intro, please click here: :ref:`project_intro`
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
@@ -17,11 +19,9 @@ Welcome to Photometric Redshifts's documentation!
 Indices and tables
 ==================
 
-* :ref:`final_project`
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
 
-Testing testing testing.
 
 .. automodule: final_project
