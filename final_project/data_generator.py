@@ -5,14 +5,97 @@ from tensorflow import keras
 # path issues with sphinx and the relative paths for running as a module, as intended when I wrote them
 abs_path = os.path.dirname(__file__)
 
+import numpy as np
+import keras
+from dataclasses import dataclass
+
+
+@dataclass
+class DataGenerator(keras.utils.Sequence):
+    """Generator for Keras training with model.fit_generator"""
+
+    data_filenames: list
+    label: list
+    batch_size: int = 32
+    dim: tuple = (32, 32, 5)
+
+    def __len__(self):
+        """Denotes the number of batches per epoch"""
+        ...
+
+    def __getitem__(self, index):
+        """Generate one batch of data"""
+        # For batch number index, get the file names
+        batch = self.file_names_for_batch_num(index)
+
+        # Generate data from batch files
+        X, y = self.__data_generation(batch)
+
+        return X, y
+
+    def on_epoch_end(self):
+        """Updates indexes with shuffle after each epoch"""
+        ...
+
+    def __data_generation(self, batch):
+        """Generates data containing batch_size samples"""
+        # Initialization
+        X = np.empty((self.batch_size, *self.dim))
+        y = np.empty((self.batch_size), dtype=int)
+
+        # Generate data
+        for i, ID in enumerate(batch):
+            # Store sample
+            X[
+                i,
+            ] = np.load("data/processed/" + ID + ".npy")
+
+            # Store class
+            y[i] = self.labels[ID]
+
+        return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
+
+
+# import numpy as np
+
+# from keras.models import Sequential
+# from my_classes import DataGenerator
+
+# # Parameters
+# params = {'dim': (32,32,32),
+#           'batch_size': 64,
+#           'n_classes': 6,
+#           'n_channels': 1,
+#           'shuffle': True}
+
+# # Datasets
+# partition = # IDs
+# labels = # Labels
+
+# # Generators
+# training_generator = DataGenerator(partition['train'], labels, **params)
+# validation_generator = DataGenerator(partition['validation'], labels, **params)
+
+# # Design model
+# model = Sequential()
+# [...] # Architecture
+# model.compile()
+
+# # Train model on dataset
+# model.fit_generator(generator=training_generator,
+#                     validation_data=validation_generator,
+#                     use_multiprocessing=True,
+#                     workers=6)
+
+
 # From
 # https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly
 
-
+"""
 class DataGenerator(keras.utils.Sequence):
     "Generates data for Keras"
 
-    def __init__(self, list_IDs, labels, batch_size=32, dim=(32, 32, 5), n_channels=1, n_classes=10, shuffle=True):
+    def __init__(self, list_IDs, labels, batch_size=32, dim=(5, 32, 32), n_channels=1, n_classes=100, shuffle=True):
         "Initialization"
         self.dim = dim
         self.batch_size = batch_size
@@ -63,3 +146,4 @@ class DataGenerator(keras.utils.Sequence):
             y[i] = self.labels[ID]
 
         return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
+"""

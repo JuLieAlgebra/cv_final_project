@@ -42,15 +42,21 @@ class Preprocessing(luigi.Task):
         """Big workhorse."""
         df = pd.read_csv(join(abs_path, "..", self.local_paths["data"], self.tabular_path))
         rows = df.iloc[self.lower : self.upper]
+
+        # logging
         logs = ""
+        logs_not_found = ""
+        logs_bad_data = ""
 
         for i, observation in rows.iterrows():
             file_name = join(self.processed_path, f"{observation.objID}-{salted.get_salted_version(self)}.npy")
 
             try:
-                print(i)  # trying to debug something....
-                # creating an account...
+                # for debugging, want to see that it tried every file it was assigned
                 logs = logs + "\n" + str(i)
+
+                # this glob will give me all of the files that match the obsveration ID in the processed directory
+                # it's our skip if this already exists function, but agnostic to the salt for now
                 if glob.glob(file_name[:-15] + "*") == []:
                     data_cube = preprocessing_utils.get_data_cube(observation)
                     # can I improve this?
@@ -59,11 +65,17 @@ class Preprocessing(luigi.Task):
                 else:
                     print("Already finished: ", file_name)
             except FileNotFoundError:
-                with open(f"debug/log_file{self.lower}.txt", mode="w") as log:
-                    log.write(file_name + "----" + str(i) + "\n")
+                logs_not_found += "\n" + file_name
             except OSError:
-                with open(f"debug/bad_data{self.lower}.txt", mode="w") as log:
-                    log.write(file_name + "----" + str(i) + "\n")
+                logs_bad_data += "\n" + file_name
+
+        # writing a log of the files that were corrupted
+        with open(f"debug/bad_data{self.lower}.txt", mode="w") as log:
+            log.write(logs_bad_data)
+
+        # writing a log of the files that weren't found
+        with open(f"debug/log_file{self.lower}.txt", mode="w") as log:
+            log.write(logs_not_found)
 
         # writing the log file
         with open(f"debug/debugging{self.lower}-{self.upper}.txt", mode="w") as debug:

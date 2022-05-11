@@ -17,6 +17,8 @@ abs_path = os.path.dirname(__file__)
 
 
 class FailedImageCheck(OSError):
+    """ """
+
     pass
 
 

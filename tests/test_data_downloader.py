@@ -16,8 +16,8 @@ class DownloaderTests(TestCase):
         # print(d)
         # luigi.build([data_downloader.URLgenerator()], local_scheduler=True)
 
-    def test_check_urls(self, n_urls=15445):
-        """Need to adjust, there won't be 50000 unique urls, only 15,445"""
+    def test_check_urls(self, n_urls=25385):
+        """Need to adjust, there won't be 50000 unique urls, only 25385"""
         urls = np.genfromtxt("data/urls.txt", dtype=str)
         assert np.unique(urls).shape[0] == n_urls
 
