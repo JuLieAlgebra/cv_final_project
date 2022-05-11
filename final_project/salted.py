@@ -2,6 +2,10 @@ from luigi import LocalTarget
 import luigi
 from luigi.task import flatten
 from hashlib import sha256
+import os
+
+# path issues with sphinx and the relative paths for running as a module, as intended when I wrote them
+abs_path = os.path.dirname(__file__)
 
 
 def get_salted_version(task: luigi.Task) -> str:
