@@ -10,6 +10,11 @@ import numpy as np
 import pandas as pd
 import astropy.io.fits
 
+# for my own sanity
+join = os.path.join
+# path issues with sphinx and the relative paths for running as a module, as intended when I wrote them
+abs_path = os.path.dirname(__file__)
+
 
 class FailedImageCheck(OSError):
     pass
@@ -20,7 +25,7 @@ class SavedS3(luigi.ExternalTask):
 
     __version__ = "0.1.0"
 
-    paths = omegaconf.OmegaConf.load("final_project/conf/aws_paths.yaml")
+    paths = omegaconf.OmegaConf.load(join(abs_path, "conf", "aws_paths.yaml"))
     data = luigi.Parameter(default="tabular")
 
     def output(self) -> S3Target:
@@ -33,8 +38,8 @@ class TabularDownloader(luigi.Task):
 
     __version__ = "0.1.0"
 
-    tabular_data = omegaconf.OmegaConf.load("final_project/conf/aws_paths.yaml")["tabular_data"]
-    csv_path = f"data/{tabular_data}"
+    tabular_data = omegaconf.OmegaConf.load(join(abs_path, "conf", "aws_paths.yaml"))["tabular_data"]
+    csv_path = join("data", f"{tabular_data}")
     csv = luigi.Parameter(default=csv_path)
 
     def requires(self) -> luigi.ExternalTask:
@@ -54,7 +59,7 @@ class URLgenerator(luigi.Task):
     """TODO docs"""
 
     __version__ = "0.1.0"
-    url_filename = luigi.Parameter(default="data/urls.txt")
+    url_filename = luigi.Parameter(default=join("data", "urls.txt"))
 
     def requires(self):
         """Requres luigi Target of downloaded csv tabular data"""
@@ -86,7 +91,7 @@ class ImageDownloader(luigi.Task):
     Downloads all files in specified range of the urls.txt. Usually used with copies of itself
     with different parameters to span the whole range of urls to download.
 
-    Example usage:
+    Example::
         n_workers = 10
         n_urls = 50000
         chunk = n_urls // n_workers
@@ -108,12 +113,15 @@ class ImageDownloader(luigi.Task):
 
     def output(self):
         """Success file with range of files"""
-        return luigi.LocalTarget(f"data/images/_SUCCESS{self.lower}-{self.upper}")
+        return luigi.LocalTarget(join("data", "images", f"_SUCCESS{self.lower}-{self.upper}"))
 
     @classmethod
     @contextmanager  # test this
     def download(cls, url) -> ContextManager:
-        """Context manager for downloading FITS images from the SDSS"""
+        """Context manager for downloading FITS images from the SDSS
+
+        :param url: string url to fits file on SDSS server
+        :return: ContextManager"""
 
         # Generating temporary and final file names
         tmp = f"{hash(url)}.fits.bz2"
@@ -122,7 +130,7 @@ class ImageDownloader(luigi.Task):
 
         try:
             # If file already exists, don't download
-            if os.path.exists(f"data/images/{file_name}"):
+            if os.path.exists(join("data", "images", f"{file_name}")):
                 print("Skipping!!", file_name)
                 yield file_name
 
@@ -135,10 +143,10 @@ class ImageDownloader(luigi.Task):
         finally:
             # # If it doesn't exist, then something went wrong downloading and we're
             # # going to delete the temp.
-            # if os.path.exists(f"data/images/{file_name}"):
+            # if os.path.exists(join("data", "images", f"{file_name}")):
             #     # check image
             #     if cls.bad_file(file_name):
-            #         os.remove(f"data/images/{file_name}")
+            #         os.remove(join("data", "images", f"{file_name}"))
             #         print("Got a bad one: ", file_name)
             #         cls.download(url)
 
@@ -146,7 +154,7 @@ class ImageDownloader(luigi.Task):
             if os.path.exists(tmp):
                 os.remove(tmp)
 
-            if not os.path.exists(f"data/images/{file_name}"):
+            if not os.path.exists(join("data", "images", f"{file_name}")):
                 # didn't download, try again
                 # TODO need to write a breakout for this recursion in case it just
                 #      can't do it
@@ -157,8 +165,11 @@ class ImageDownloader(luigi.Task):
     def bad_file(cls, file_name: str) -> bool:
         """Using astropy's file checking to make sure the files didn't
         get corrupted.
-        TODO removed hard coded paths here."""
-        path = f"data/images/{file_name}"
+        TODO removed hard coded paths here.
+
+        :param file_name: string of the file to be checked, excludes directory
+        :return: bool"""
+        path = join("data", "images", f"{file_name}")
         try:
             with bz2.BZ2File(path, "rb") as file:
                 with astropy.io.fits.open(path) as hdulist:

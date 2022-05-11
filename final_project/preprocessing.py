@@ -1,4 +1,5 @@
 import os
+from os.path import join
 import zipfile
 import glob
 
@@ -11,6 +12,9 @@ from final_project import data_downloader
 from final_project import preprocessing_utils
 from final_project import salted
 
+# path issues with sphinx and the relative paths for running as a module, as intended when I wrote them
+abs_path = os.path.dirname(__file__)
+
 
 class Preprocessing(luigi.Task):
     """Takes the zipped image files and ends up with the finished, saved datacubes in .npy format"""
@@ -18,9 +22,9 @@ class Preprocessing(luigi.Task):
     __version__ = "0.1.0"
 
     # Grabs the tabular data's name, want to be agnostic to future changes to that file
-    tabular_path = omegaconf.OmegaConf.load("final_project/conf/aws_paths.yaml")["tabular_data"]
-    local_paths = omegaconf.OmegaConf.load("final_project/conf/local_paths.yaml")
-    processed_path = os.path.join(local_paths["data"], local_paths["processed"])
+    tabular_path = omegaconf.OmegaConf.load(join(abs_path, "conf", "aws_paths.yaml"))["tabular_data"]
+    local_paths = omegaconf.OmegaConf.load(join(abs_path, "conf", "local_paths.yaml"))
+    processed_path = join(abs_path, local_paths["data"], local_paths["processed"])
 
     # range of downloaded files to process = [lower, upper]
     lower = luigi.IntParameter()
@@ -28,7 +32,7 @@ class Preprocessing(luigi.Task):
 
     def output(self) -> luigi.LocalTarget:
         return luigi.LocalTarget(
-            os.path.join(self.processed_path, f"_SUCCESS{self.lower}-{self.upper}-{salted.get_salted_version(self)}")
+            join(abs_path, self.processed_path, f"_SUCCESS{self.lower}-{self.upper}-{salted.get_salted_version(self)}")
         )
 
     def requires(self) -> list:
@@ -36,11 +40,13 @@ class Preprocessing(luigi.Task):
 
     def run(self):
         """Big workhorse."""
-        df = pd.read_csv(os.path.join(self.local_paths["data"], self.tabular_path))
+        df = pd.read_csv(join(abs_path, self.local_paths["data"], self.tabular_path))
         rows = df.iloc[self.lower : self.upper]
 
         for i, observation in rows.iterrows():
-            file_name = os.path.join(self.processed_path, f"{observation.objID}-{salted.get_salted_version(self)}.npy")
+            file_name = join(
+                abs_path, self.processed_path, f"{observation.objID}-{salted.get_salted_version(self)}.npy"
+            )
 
             try:
                 with open(f"debug/debugging{self.lower}-{self.upper}.txt", mode="w") as debug:
@@ -69,10 +75,10 @@ class Preprocessing(luigi.Task):
 class GenTrainTestData(luigi.Task):
     """Skeleton code for possibly how I'll do the test & train split and prep before training"""
 
-    local_paths = omegaconf.OmegaConf.load("final_project/conf/local_paths.yaml")
+    local_paths = omegaconf.OmegaConf.load(join(abs_path, "conf", "local_paths.yaml"))
 
-    test_directory = os.path.join(local_paths["data"], local_paths["test"])
-    train_directory = os.path.join(local_paths["data"], local_paths["train"])
+    test_directory = join(abs_path, local_paths["data"], local_paths["test"])
+    train_directory = join(abs_path, local_paths["data"], local_paths["train"])
     SPLIT = 0.8  # fraction of dataset that is trained on
 
     def output(self):

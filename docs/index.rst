@@ -10,13 +10,18 @@ Welcome to Photometric Redshifts's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   modules
+
 
 
 Indices and tables
 ==================
 
+* :ref:`final_project`
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
 
 Testing testing testing.
+
+.. automodule: final_project

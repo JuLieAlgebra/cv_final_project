@@ -1,5 +1,8 @@
 import numpy as np
-import keras
+from tensorflow import keras
+
+# path issues with sphinx and the relative paths for running as a module, as intended when I wrote them
+abs_path = os.path.dirname(__file__)
 
 # From
 # https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly
@@ -32,7 +35,7 @@ class DataGenerator(keras.utils.Sequence):
         list_IDs_temp = [self.list_IDs[k] for k in indexes]
 
         # Generate data
-        X, y = self.__data_generation(list_IDs_temp)
+        X, y = self._data_generation(list_IDs_temp)
 
         return X, y
 
@@ -42,7 +45,7 @@ class DataGenerator(keras.utils.Sequence):
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
 
-    def __data_generation(self, list_IDs_temp):
+    def _data_generation(self, list_IDs_temp):
         "Generates data containing batch_size samples"  # X : (n_samples, *dim, n_channels)
         # Initialization
         X = np.empty((self.batch_size, *self.dim, self.n_channels))

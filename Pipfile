@@ -9,6 +9,7 @@ pytest-cov = "*"
 black = "*"
 isort = "*"
 sphinx = "*"
+sphinx-rtd-theme = "*"
 pre-commit = "*"
 
 [packages]
@@ -18,7 +19,7 @@ luigi = "*"
 boto3 = "*"
 matplotlib = "*"
 omegaconf = "*"
-sphinx = "*"
+tensorflow= "*"
 
 [requires]
 python_version = "3.8"

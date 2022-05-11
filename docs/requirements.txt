@@ -1,0 +1,9 @@
+sphinx==4.5.0
+sphinx-rtd-theme
+pandas
+astropy
+luigi
+boto3
+matplotlib
+omegaconf
+tensorflow

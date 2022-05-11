@@ -1,9 +1,12 @@
 import luigi
-import keras
+from tensorflow import keras
 import omegaconf
 
 from final_project import preprocessing
 from final_project import salted
+
+# path issues with sphinx and the relative paths for running as a module, as intended when I wrote them
+abs_path = os.path.dirname(__file__)
 
 
 class TrainModel(luigi.Task):
