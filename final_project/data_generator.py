@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from tensorflow import keras
 
 # path issues with sphinx and the relative paths for running as a module, as intended when I wrote them
