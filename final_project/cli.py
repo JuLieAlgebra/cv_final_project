@@ -19,7 +19,7 @@ def get_ranges(n_workers=14, n_obj=1000):
 def main():
     """Main function"""
     n_workers = 14
-    n_obj = 4000
+    n_obj = 10000
     ranges = get_ranges(n_workers=n_workers, n_obj=n_obj)
 
     luigi.build(

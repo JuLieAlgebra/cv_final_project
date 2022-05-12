@@ -31,15 +31,27 @@ class Preprocessing(luigi.Task):
     upper = luigi.IntParameter()
 
     def output(self) -> luigi.LocalTarget:
+        """The 'I'm done' file for this task is a _SUCCESS flag file"""
         return luigi.LocalTarget(
             join(self.processed_path, f"_SUCCESS{self.lower}-{self.upper}-{salted.get_salted_version(self)}")
         )
 
     def requires(self) -> list:
+        """
+        Only kicks off one instance of ImageDownloader, so the number of instances of the Preprocessing task is the
+        same as the number of instances of ImageDownloader.
+        """
         return data_downloader.ImageDownloader(lower=self.lower * 5, upper=self.upper * 5)
 
-    def run(self):
-        """Big workhorse."""
+    def run(self) -> None:
+        """
+        Currently filled with a lot of log writing. Opens the downloaded tabular data and creates
+        one data cube for each galaxy in the catalog from the 5 fits images we downloaded in ImageDownloader.
+        Calls preprocessing_utils.get_data_cube if finished datacube npy doesn't exist already.
+
+        If something fails with a corrupted file or one required file was not downloaded, it logs it and continues with
+        the processing.
+        """
         df = pd.read_csv(join(abs_path, "..", self.local_paths["data"], self.tabular_path))
         rows = df.iloc[self.lower : self.upper]
 
@@ -86,20 +98,20 @@ class Preprocessing(luigi.Task):
             outfile.write(f"Success: {self.lower}-{self.upper}")
 
 
-class GenTrainTestData(luigi.Task):
-    """Skeleton code for possibly how I'll do the test & train split and prep before training"""
+# class GenTrainTestData(luigi.Task):
+#     """Skeleton code for possibly how I'll do the test & train split and prep before training"""
 
-    local_paths = omegaconf.OmegaConf.load(join(abs_path, "conf", "local_paths.yaml"))
+#     local_paths = omegaconf.OmegaConf.load(join(abs_path, "conf", "local_paths.yaml"))
 
-    test_directory = join(abs_path, local_paths["data"], local_paths["test"])
-    train_directory = join(abs_path, local_paths["data"], local_paths["train"])
-    SPLIT = 0.8  # fraction of dataset that is trained on
+#     test_directory = join(abs_path, local_paths["data"], local_paths["test"])
+#     train_directory = join(abs_path, local_paths["data"], local_paths["train"])
+#     SPLIT = 0.8  # fraction of dataset that is trained on
 
-    def output(self):
-        # Oh not going to work, outputs are entire directories? Need to resolve. Also with the Salted stuff...
-        paths = ...
-        return {"test": luigi.LocalTarget(self.test_directory), "train": luigi.LocalTarget(self.train_directory)}
+#     def output(self):
+#         # Oh not going to work, outputs are entire directories? Need to resolve. Also with the Salted stuff...
+#         paths = ...
+#         return {"test": luigi.LocalTarget(self.test_directory), "train": luigi.LocalTarget(self.train_directory)}
 
-    def requires(self):
-        """ """
-        return final_project.preprocessing.ToNumpy()
+#     def requires(self):
+#         """ """
+#         return final_project.preprocessing.ToNumpy()

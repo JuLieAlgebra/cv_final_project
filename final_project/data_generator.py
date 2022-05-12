@@ -1,43 +1,46 @@
-import numpy as np
 import os
-from tensorflow import keras
+from dataclasses import dataclass
+import glob
+
+import numpy as np
+import tensorflow as tf
 
 # path issues with sphinx and the relative paths for running as a module, as intended when I wrote them
 abs_path = os.path.dirname(__file__)
 
-import numpy as np
-import keras
-from dataclasses import dataclass
-
 
 @dataclass
-class DataGenerator(keras.utils.Sequence):
+class DataGenerator(tf.keras.utils.Sequence):  # utils.Sequence):
     """Generator for Keras training with model.fit_generator"""
 
     data_filenames: list
-    label: list
+    labels: list
+    n_classes: int
     batch_size: int = 32
-    dim: tuple = (32, 32, 5)
+    dim: tuple = (5, 32, 32)
 
     def __len__(self):
         """Denotes the number of batches per epoch"""
-        ...
+        return len(self.data_filenames) // self.batch_size
 
     def __getitem__(self, index):
         """Generate one batch of data"""
         # For batch number index, get the file names
-        batch = self.file_names_for_batch_num(index)
+        batch = np.random.choice(self.data_filenames, self.batch_size, replace=False)
 
         # Generate data from batch files
-        X, y = self.__data_generation(batch)
+        X, y = self._data_generation(batch)
 
         return X, y
 
     def on_epoch_end(self):
         """Updates indexes with shuffle after each epoch"""
-        ...
+        self.indexes = np.arange(len(self.data_filenames))
+        if self.shuffle == True:
+            np.random.shuffle(self.indexes)
+        # check accuracy, if better, save?
 
-    def __data_generation(self, batch):
+    def _data_generation(self, batch):
         """Generates data containing batch_size samples"""
         # Initialization
         X = np.empty((self.batch_size, *self.dim))
@@ -45,20 +48,24 @@ class DataGenerator(keras.utils.Sequence):
 
         # Generate data
         for i, ID in enumerate(batch):
-            # Store sample
-            X[
-                i,
-            ] = np.load("data/processed/" + ID + ".npy")
+            try:  # TODO remove, artifact of not every obj in csv being downloaded & processed
+                # Store sample
+                x = glob.glob("data/processed/" + str(ID) + "-*.npy")[0]
+                X[
+                    i,
+                ] = np.load(x)
 
-            # Store class
-            y[i] = self.labels[ID]
-
-        return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
+                # Store class
+                y[i] = self.labels[ID]
+            except KeyError:
+                pass
+        print("KERA S UTTILS CATEGORIACAL : ", tf.keras.utils.to_categorical(y, num_classes=self.n_classes))
+        return X, tf.keras.utils.to_categorical(y, num_classes=self.n_classes)
 
 
 # import numpy as np
 
-# from keras.models import Sequential
+# from tf.keras.models import Sequential
 # from my_classes import DataGenerator
 
 # # Parameters
@@ -92,7 +99,7 @@ class DataGenerator(keras.utils.Sequence):
 # https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly
 
 """
-class DataGenerator(keras.utils.Sequence):
+class DataGenerator(tf.keras.utils.Sequence):
     "Generates data for Keras"
 
     def __init__(self, list_IDs, labels, batch_size=32, dim=(5, 32, 32), n_channels=1, n_classes=100, shuffle=True):
@@ -145,5 +152,5 @@ class DataGenerator(keras.utils.Sequence):
             # Store class
             y[i] = self.labels[ID]
 
-        return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
+        return X, tf.keras.utils.to_categorical(y, num_classes=self.n_classes)
 """

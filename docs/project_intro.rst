@@ -5,7 +5,7 @@ Title
 
 Hello! Testing, testing.
 
-I used Luigi and salted graphs for data extraction, preprocessing, and experimentation while I replicated (and modified) the smaller architectures from these two papers: :Photometric redshifts from SDSS images using a Convolutional Neural Network:`https://arxiv.org/abs/1806.06607` and :Investigating Deep Learning Methods for Obtaining Photometric Redshift Estimations from Images:`https://arxiv.org/abs/2109.02503v1`.
+I used Luigi and salted graphs for data extraction, preprocessing, and experimentation while I replicated (and modified) the smaller architectures from these two papers: `Photometric redshifts from SDSS images using a Convolutional Neural Network <https://arxiv.org/abs/1806.06607>`_ and `Investigating Deep Learning Methods for Obtaining Photometric Redshift Estimations from Images <https://arxiv.org/abs/2109.02503v1>`_.
 
 I'm replicating the smaller architecture from the first, and the idea of using a mixed-input model from the second. The overall goal of the project is to produce distance estimations of galaxies from photos in a learned approach.
 

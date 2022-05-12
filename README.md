@@ -6,7 +6,7 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/927273e266d47d404488/maintainability)](https://codeclimate.com/github/JuLieAlgebra/final_project/maintainability)
 
-[![Test Coverage](https://api.codeclimate.com/v1/badges/927273e266d47d404488/test_coverage)](https://codeclimate.com/github/JuLieAlgebra/final_project/test_coverage)
+<!-- [![Test Coverage](https://api.codeclimate.com/v1/badges/927273e266d47d404488/test_coverage)](https://codeclimate.com/github/JuLieAlgebra/final_project/test_coverage) -->
 
 <!-- [![Commit activity](https://img.shields.io/github/commit-activity/m/fpgmaas/cookiecutter-poetry-example)](https://img.shields.io/github/commit-activity/m/fpgmaas/cookiecutter-poetry-example)
 [![Docs](https://img.shields.io/badge/docs-gh--pages-blue)](https://fpgmaas.github.io/cookiecutter-poetry-example/) -->

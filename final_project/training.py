@@ -1,17 +1,23 @@
 import os
 from dataclasses import dataclass
+from functools import cached_property
+import glob
 
 import luigi
 from tensorflow import keras
-import omegaconf
+import numpy as np
+import pandas as pd
+from omegaconf import OmegaConf
 
 from final_project import preprocessing
 from final_project import salted
 from final_project.data_generator import DataGenerator
 
-# path issues with sphinx and the relative paths for running as a module, as intended when I wrote them
-abs_path = os.path.dirname(__file__)
-join = os.path.join
+
+###################
+abs_path = os.path.dirname(__file__)  # for pathing with sphinx
+join = os.path.join  # for my own sanity
+###################
 
 
 class TrainModel(luigi.Task):
@@ -22,66 +28,22 @@ class TrainModel(luigi.Task):
     """
 
     # Two config files to avoid code changes
-    conf_name = omegaconf.OmegaConf.load(join(abs_path, "conf", "train_configs.yaml"))["conf_to_use"]
-    params = omegaconf.OmegaConf.load(join(abs_path, "conf", conf_name))
+    conf_name = OmegaConf.load(join(abs_path, "conf", "train_configs.yaml"))["conf_to_use"]
+    params = OmegaConf.load(join(abs_path, "conf", conf_name))
 
     # some repeated code in order to have the parameters become part of the salt
     batch_size = luigi.Parameter(default=params["batch_size"])
     test_split = luigi.Parameter(default=params["test_split"])  # fraction of data to be in test set
     num_classes = luigi.Parameter(default=params["num_classes"])
     seed = luigi.Parameter(default=params["random_seed"])
-    np.random.seed(seed)
-
-    # gonna use property to set this TODO
-    partition = partition
-
-    # need to make partition and correct this
-    training_generator = DataGenerator(partition["train"], labels, **params)
-    validation_generator = DataGenerator(partition["validation"], labels, **params)
-
-    model = Model(**params)
-
-    @property
-    def partition(self) -> dict:
-        """
-        Or something like this. Creates the partition labels for testing & training
-        :return: dict of file names, minus salts TODO fix
-        """
-
-        partition = {}
-        # get a numpy array of all the processed data ready for training
-        dataset = np.array(os.listdir("../data/processed/"))
-
-        # TODO check the number for slicing, make sure I only grab the unique object IDs
-        unique_data = np.unique(dataset[:, :-14])
-
-        # random shuffle based on set seed.
-        shuffled = np.random.shuffle(unique_data)  # np.random.choice(unique_data, len(unique_data), replace=False)
-        partition["test"] = shuffled[: len(shuffled) * self.test_split]
-        partition["train"] = shuffled[len(shuffled) * self.test_split :]
-
-        return partition
-
-    def train(self) -> None:
-        """Trains the model, not sure if this is how I want it structured."""
-        # Train model on dataset
-        self.model.fit_generator(
-            generator=self.training_generator,
-            validation_data=self.validation_generator,
-            use_multiprocessing=True,
-            workers=6,
-        )
-
-    def predict(self) -> None:
-        """Should have a function for easy predictions and easy plotting/visualization"""
-        # eh?
-        self.model.predict_generator(generator=self.validation_generator)
 
     def requires(self) -> luigi.LocalTarget:
-        """Ah, need to think about how to condense back down........ Need salt to not depend on partition for everything
+        """
+        Ah, need to think about how to condense back down........ Need salt to not depend on partition for everything
         in order for luigi to condense all the 10+ calls of TrainModel to a single one.... ?
-        Actually no, I think I just kick off the ImageProcessing here."""
-        return
+        Actually no, I think I just kick off the ImageProcessing here.
+        """
+        return  # ???
 
     def output(self) -> luigi.LocalTarget:
         """Trained model with checkpoints....."""
@@ -90,35 +52,106 @@ class TrainModel(luigi.Task):
 
     def run(self) -> None:
         """Handles kicking off model training and writing success files/final model file"""
-        self.model.train()
+        self.model = Model(**params)
+        self.model.train(...)
 
-        # with self.output().open(mode='w') as success:
-        #     success.write("success")
+        self.model.save(join(abs_path, "..", "data", f"models-{salted.get_salted_version(self)}"))
+
+        with self.output().open(mode="w") as success:
+            success.write("success")
 
 
 @dataclass
-class InceptionModel:
+class BaseModel:  # (ABC):
     batch_size: int
     test_split: float
     num_classes: int
     seed: int
 
-    def fit_generator(self, **kwargs):
+    @cached_property
+    def labels(self) -> dict:
+        """Creates dict of series object."""
+        tabular_name = OmegaConf.load(join(abs_path, "conf", "aws_paths.yaml"))["tabular_data"]
+        tabular_path = join(abs_path, "..", "data", tabular_name)  # need to change to "..", "data" for reg use
+        df = pd.read_csv(tabular_path, usecols=["objID", "z"])
+        series = pd.Series(data=df.z, index=df.objID)
+
+        return {"test": series.loc[self.partition["test"]], "train": series.loc[self.partition["train"]]}
+
+    @cached_property
+    def partition(self) -> dict:
+        """
+        Or something like this. Creates the partition labels for testing & training
+        :return: dict of file names, minus salts TODO fix
+        """
+
+        partition = {}
+        # get a numpy array of all the processed data ready for training
+        # dataset = glob.glob(join("..", "data", "processed", "*.npy")) #os.listdir("data/processed/")
+        dataset = glob.glob(join("data", "processed", "*.npy"))  # os.listdir("data/processed/")
+
+        func = lambda file: int(file[15:-15])
+        dataset = np.array(list(map(func, dataset)))
+
+        unique_data = np.unique(dataset)
+
+        # random shuffle based on set seed.
+        np.random.shuffle(unique_data)  # np.random.choice(unique_data, len(unique_data), replace=False)
+        partition["test"] = unique_data[: int(len(unique_data) * self.test_split)]
+        partition["train"] = unique_data[int(len(unique_data) * self.test_split) :]
+
+        return partition
+
+    @cached_property
+    def training_generator(self) -> DataGenerator:
+        """
+        Cached property, so only gets called once when the property is accessed. Part of BaseModel class.
+        Creates an intance of the DataGenerator class with the relevant test/train partition to use for training
+        or prediction.
+        """
+        return DataGenerator(self.partition["train"], self.labels)  # , **params)
+
+    @cached_property
+    def testing_generator(self) -> DataGenerator:
+        """
+        Cached property, so only gets called once when the property is accessed. Part of BaseModel class.
+        Creates an intance of the DataGenerator class with the relevant test/train partition to use for training
+        or prediction.
+        """
+        return DataGenerator(self.partition["test"], self.labels)  # , **params)
+
+    def fit(self, **kwargs):
         """Wrapper for fitting the model with the generator we created"""
-        return self.model.fit_generator(kwargs)
+        return self.model.fit(self.training_generator)
 
 
 @dataclass
-class MixedInputModel:
+class InceptionModel(BaseModel):
+    """Inception model from Pasquet et al paper"""
+
     batch_size: int
     test_split: float
     num_classes: int
     seed: int
 
-    def fit_generator(self, **kwargs):
-        """Wrapper for fitting the model with the generator we created"""
-        return self.model.fit_generator(kwargs)
+    def architecture(self):
+        """Constructs the model architecture"""
+        pass
 
+
+@dataclass
+class MixedInputModel(BaseModel):
+    batch_size: int
+    test_split: float
+    num_classes: int
+    seed: int
+
+    def architecture(self):
+        """Constructs the model architecture"""
+        pass
+
+
+from tensorflow import keras
 
 # from keras.layers import Sequential
 from keras import Model
@@ -219,11 +252,37 @@ class RedShiftClassificationModel(Model):
 
 
 # if __name__ == "__main__":
-#     from model_utils import save_model_image
 #     rscm = RedShiftClassificationModel((64, 64, 5), 1024)
-#     save_model_image(rscm, 'redshiftmodel.png')
+#     from keras.utils import plot_model
+
+#     plot_model(model, filename)
 #     # print(rscm.predict(np.random.rand(1, 64, 64, 5)).shape)
 #     # rscm.prepare_for_training()
+
+
+# from me, cut
+# def train(self) -> None:
+#     """Trains the model, not sure if this is how I want it structured."""
+#     # Train model on dataset
+#     self.model.fit_generator(
+#         generator=self.training_generator,
+#         validation_data=self.validation_generator,
+#         use_multiprocessing=True,
+#         workers=6,
+#     )
+
+# def predict(self) -> None:
+#     """Should have a function for easy predictions and easy plotting/visualization"""
+#     # eh?
+#     self.model.predict_generator(generator=self.validation_generator)
+
+# also me:
+# # gonna use property to set this TODO
+# partition = partition
+
+# # need to make partition and correct this
+# training_generator = DataGenerator(partition["train"], labels, **params)
+# testing_generator = DataGenerator(partition["validation"], labels, **params)
 
 
 # from https://machinelearningmastery.com/check-point-deep-learning-models-keras/

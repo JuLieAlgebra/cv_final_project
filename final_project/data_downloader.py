@@ -31,6 +31,7 @@ class SavedS3(luigi.ExternalTask):
     data = luigi.Parameter(default="tabular")
 
     def output(self) -> S3Target:
+        """Points to S3 tabular data target"""
         s3_path = self.paths[f"{self.data}_dir"] + self.paths[f"{self.data}_data"]
         return S3Target(s3_path, format=luigi.format.Nop)
 
@@ -45,10 +46,18 @@ class TabularDownloader(luigi.Task):
     csv = luigi.Parameter(default=csv_path)
 
     def requires(self) -> luigi.ExternalTask:
+        """
+        Luigi function to kick off the requirements for this task before running it - part of the DAG.
+        This one needs the tabular file to exist on S3 before it can download it.
+        """
         # string to grab path from yaml config
         return SavedS3("tabular")
 
     def output(self) -> luigi.LocalTarget:
+        """
+        Luigi function to understand what the 'I'm done' file output will be from this task so it can
+        run the next in the sequence.
+        """
         return luigi.LocalTarget(self.csv, format=luigi.format.Nop)
 
     def run(self) -> None:
@@ -111,6 +120,10 @@ class ImageDownloader(luigi.Task):
     upper = luigi.IntParameter()
 
     def requires(self):
+        """
+        Luigi function to kick off the requirements for this task before running it - part of the DAG.
+        This one requires the file of urls to download to be successfully made before it can download the images.
+        """
         return URLgenerator()
 
     def output(self):
