@@ -67,7 +67,7 @@ class TabularDownloader(luigi.Task):
 
 
 class URLgenerator(luigi.Task):
-    """TODO docs"""
+    """Luigi task to generate the URLS from the tabular data file"""
 
     __version__ = "0.1.0"
     url_filename = luigi.Parameter(default=join("data", "urls.txt"))
@@ -156,6 +156,12 @@ class ImageDownloader(luigi.Task):
                 os.system(f"mv data/images/{tmp} data/images/{file_name}")
                 yield file_name
         finally:
+            # This is messy to leave here, but I wanted to illustrate my thought process
+            # This does check that the file isn't corrupted, which becomes a problem in the
+            # pre-processing steps, but the data checking does take hours to run. I modified this
+            # idea into a random check of a dozen files as part of my testing pipeline (which is not
+            # designed for CI)
+
             # # If it doesn't exist, then something went wrong downloading and we're
             # # going to delete the temp.
             # if os.path.exists(join("data", "images", f"{file_name}")):

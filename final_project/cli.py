@@ -1,10 +1,11 @@
 import luigi
 
-from final_project import data_downloader, preprocessing, salted, preprocessing_utils
+from final_project import data_downloader, preprocessing, salted, preprocessing_utils, training
 
 
 def get_ranges(n_workers=14, n_obj=1000):
-    """Helper function for kicking off the image processing tasks.
+    """
+    Helper function for kicking off the image processing tasks.
 
     :param n_workers: int
     :param n_obj: int
@@ -22,8 +23,10 @@ def main():
     n_obj = 10000
     ranges = get_ranges(n_workers=n_workers, n_obj=n_obj)
 
+    tasks = [preprocessing.Preprocessing(lower=i[0], upper=i[1]) for i in ranges]
+
     luigi.build(
-        [preprocessing.Preprocessing(lower=i[0], upper=i[1]) for i in ranges],
+        tasks.append(training.TrainModel()),
         local_scheduler=True,
         workers=n_workers,
     )
