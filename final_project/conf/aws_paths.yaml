@@ -1,3 +1,4 @@
 tabular_dir: s3://photometric-redshift/tabular-data/
-tabular_data: SDSS_tabular_data.csv
+tabular_data: SDSS_tabular_data_with_mag.csv
+# tabular_data: paper_2018_with_mags.csv
 validation_dir: s3://photometric-redshift/validation_data/

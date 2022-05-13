@@ -31,13 +31,13 @@ def get_data_cube(observation: pd.Series) -> np.ndarray:
 
     data_cube = np.zeros((5, dim, dim), dtype=np.float64)
     for i, f in enumerate(files):
-        data_cube[i] = get_cropped(observation, f, dim, bands[i])
+        data_cube[i] = get_cropped(observation, f, dim)
 
     # datacube should be (5, dim, dim)
     return data_cube
 
 
-def galactic_coord_to_pixel(observation: pd.Series, fits_file: str, dim: int) -> np.array:
+def get_cropped(observation: pd.Series, fits_file: str, dim: int) -> np.array:
     """
     Thanks to https://lukaswenzl.com/wold-coordinate-system-astropy/ for the reminders!
 

@@ -222,11 +222,10 @@ class InceptionModel(BaseModel):
         model = tensorflow.keras.Model(inputs=[image_input], outputs=model_output)
 
         model.summary()
-        print(model.summary())
+        # print(model.summary())
         opt = Adam(self.lr)
-        model.compile(
-            optimizer=opt, loss="categorical_categorical_crossentropy", metrics=["categorical_categorical_accuracy"]
-        )
+        # loss = tensorflow.keras.losses.CategoricalCrossentropy(from_logits=True)
+        model.compile(optimizer=opt, loss="categorical_crossentropy", metrics=["categorical_accuracy"])
         return model
 
     def add_inception_layer(self, input_weights, num_f1, num_f2, kernel_5=True):
