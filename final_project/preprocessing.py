@@ -96,22 +96,3 @@ class Preprocessing(luigi.Task):
         # writing the success file
         with self.output().open("w") as outfile:
             outfile.write(f"Success: {self.lower}-{self.upper}")
-
-
-# class GenTrainTestData(luigi.Task):
-#     """Skeleton code for possibly how I'll do the test & train split and prep before training"""
-
-#     local_paths = omegaconf.OmegaConf.load(join(abs_path, "conf", "local_paths.yaml"))
-
-#     test_directory = join(abs_path, local_paths["data"], local_paths["test"])
-#     train_directory = join(abs_path, local_paths["data"], local_paths["train"])
-#     SPLIT = 0.8  # fraction of dataset that is trained on
-
-#     def output(self):
-#         # Oh not going to work, outputs are entire directories? Need to resolve. Also with the Salted stuff...
-#         paths = ...
-#         return {"test": luigi.LocalTarget(self.test_directory), "train": luigi.LocalTarget(self.train_directory)}
-
-#     def requires(self):
-#         """ """
-#         return final_project.preprocessing.ToNumpy()
