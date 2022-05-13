@@ -1,14 +1,15 @@
 .. _project-intro:
-*****
-Title
-*****
+*************
+Project Intro
+*************
 
-Hello! Testing, testing.
+I used Luigi and salted graphs for data extraction, preprocessing, and experimentation while I replicated (and modified) the smaller architecture from this paper: `Photometric redshifts from SDSS images using a Convolutional Neural Network <https://arxiv.org/abs/1806.06607>`_. I also reference this one quite a lot in my discussion: `Investigating Deep Learning Methods for Obtaining Photometric Redshift Estimations from Images <https://arxiv.org/abs/2109.02503v1>`_.
 
-I used Luigi and salted graphs for data extraction, preprocessing, and experimentation while I replicated (and modified) the smaller architectures from these two papers: `Photometric redshifts from SDSS images using a Convolutional Neural Network <https://arxiv.org/abs/1806.06607>`_ and `Investigating Deep Learning Methods for Obtaining Photometric Redshift Estimations from Images <https://arxiv.org/abs/2109.02503v1>`_.
+.. I'm replicating the smaller architecture from the first, and the idea of using a mixed-input model from the second.
+The overall goal of the project is to produce an automated pipeline for training models to produce distance estimations of galaxies from photos in a learned approach. Below is a quick overview of the science behind why this is possible.
 
-I'm replicating the smaller architecture from the first, and the idea of using a mixed-input model from the second. The overall goal of the project is to produce distance estimations of galaxies from photos in a learned approach.
-
+Problem Background
+##################
 How far away is this galaxy?
 
 .. image:: images/galaxy_dist.png
@@ -25,7 +26,7 @@ It also underpins every aspect of research. From determining the age of the univ
   :alt: Hubble Deep Field image with galaxy circled
 
 Astronomers have developed a variety of methods, used for different distances and different situations, but we will talk about the most
-accurate and its learned approximation. See the More Details section for, well, more details.
+accurate and its learned approximation.
 
 Most astronomy pipelines today transform a cleaned image of an object in a particular filter to a single
 number, magnitude, that can then be used in a machine learning approach. There are other things
@@ -43,12 +44,6 @@ done today are random forests or vanilla, smaller neural networks.
 
 .. image:: images/doppler.png
   :width: 500
-  :alt: Hubble Deep Field image with galaxy circled
-
-
-.. image:: images/preprocess_vis.png
-  :width: 500
-  :alt: Hubble Deep Field image with galaxy circled
 
 
 Definitions
@@ -57,12 +52,9 @@ Definitions
 general public explanations that don’t involve excessive jargon that I could find. Will find better
 explanations to link to and better explain each idea in more detail for the actual report.)
 `Redshift <https://en.wikipedia.org/wiki/Redshift>`_ – “distance” as measured by Doppler shift.
-`Hubble Constant <>`_ – a time varying parameter that tells us the rate of expansion of the universe at that
-	time epoch
-`CCD <>`_ – the camera of choice for most telescopes
-`Spectroscopic Redshift <>`_ – more accurate than photometric redshifts. Distance measurements produced
-	by fitting spectra data to a black body curve
-`Photometric Redshift` - distance measurements produced by photometric data
-`Photometric <>`_ – Data produced by photos of objects. Usually taken in a filter to only capture photos in a
-		given range of wavelengths (red, blue, green, etc).
-`SDSS <>`_ – Sloan Digital Sky Survey
+`Hubble Constant <https://lweb.cfa.harvard.edu/~dfabricant/huchra/hubble/>`_ – a time varying parameter that tells us the rate of expansion of the universe at that time epoch
+`CCD <https://en.wikipedia.org/wiki/Charge-coupled_device>`_ – the camera of choice for most telescopes
+`Spectroscopic Redshift <https://en.wikipedia.org/wiki/Redshift#Observations_in_astronomy>`_ – more accurate than photometric redshifts. Distance measurements produced by fitting spectra data to a black body curve
+`Photometric Redshift <https://en.wikipedia.org/wiki/Photometric_redshift>`_ - distance measurements produced by photometric data
+`Photometric <https://en.wikipedia.org/wiki/Photometry_(astronomy)>`_ – Data produced by photos of objects. Usually taken in a filter to only capture photos in a given range of wavelengths (red, blue, green, etc).
+`SDSS <https://www.sdss.org/>`_ – Sloan Digital Sky Survey
