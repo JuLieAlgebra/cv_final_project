@@ -2,7 +2,7 @@
 
 <!-- [![Release](https://img.shields.io/github/v/release/fpgmaas/cookiecutter-poetry-example)](https://img.shields.io/github/v/release/fpgmaas/cookiecutter-poetry-example) -->
 
-[![Build status](https://img.shields.io/github/workflow/status/fpgmaas/cookiecutter-poetry-example/merge-to-main)](https://img.shields.io/github/workflow/status/fpgmaas/cookiecutter-poetry-example/merge-to-main)
+[![Build status](https://github.com/JuLieAlgebra/photometric_redshift/actions/workflows/testing.yml/badge.svg?branch=master)](https://github.com/JuLieAlgebra/photometric_redshift/actions/workflows/testing.yml)
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/927273e266d47d404488/maintainability)](https://codeclimate.com/github/JuLieAlgebra/final_project/maintainability)
 
