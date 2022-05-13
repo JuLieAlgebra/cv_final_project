@@ -13,20 +13,17 @@ As a quick overview of the luigi tasks involved:
 .. image:: images/flow_chart.png
   :width: 500
 
-Data Downloading: :ref:`data-downloading-overview`
-
-Preprocessing: :ref:`preprocessing-overview`
-
-Salted: :ref:`salted`
-
-Training: :ref:`training`
-
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    modules
+   project_intro
+   data_downloading_overview
+   preprocessing_overview
+   salted
+   training
 
 
 
