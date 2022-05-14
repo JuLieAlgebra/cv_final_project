@@ -20,6 +20,8 @@ boto3 = "*"
 matplotlib = "*"
 omegaconf = "*"
 tensorflow= "*"
+pydot = "*"
+graphviz = "*"
 
 [requires]
 python_version = "3.8"

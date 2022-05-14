@@ -46,9 +46,6 @@ class DataGenerator(tf.keras.utils.Sequence):
         for i in range(0, num_batches):
             batch[i] = shuffled[i * self.batch_size : j * self.batch_size]
             j += 1
-        # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5")
-        # print(batch[0].shape)
-        # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5")
 
         return batch
 
@@ -69,34 +66,32 @@ class DataGenerator(tf.keras.utils.Sequence):
 
     def on_epoch_end(self):
         """Updates indexes with shuffle after each epoch"""
+        print(
+            "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\
+               Calling on_epoch_end in DataGenerator \n\
+               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        )
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
-        # check accuracy, if better, save?
 
     def _data_generation(self, batch):
-        """From file names for a batch, generate the data"""
+        """
+        From file names for a batch, generate the data.
+        """
         # print("Is this getting called??")
         X = np.zeros((self.batch_size, *self.dim))
-        y = np.zeros((self.batch_size), dtype=int)
+        y = np.zeros((self.batch_size))
 
         # Generate data
         for i, ID in enumerate(batch):
             x = glob.glob("data/processed/" + str(ID) + "-*.npy")[0]
             # print(x)
-            X[
-                i,
-            ] = np.load(os.path.join(abs_path, "..", x)).T
-            # print(" this is X", X.shape)
+            X[i] = np.load(os.path.join(abs_path, "..", x)).T
 
             # small bug here from how I've integrated the model architecture from Pasquet.
-            if type(self.labels[ID]) == pd.Series:  # float and type(self.labels[ID]) != np.float64:
-                print("Pd series again: ", self.labels[ID].values[0:2])
+            if type(self.labels[ID]) == pd.Series:
+                y[i] = self.labels[ID].values[0]
             else:
                 y[i] = self.labels[ID]
 
-        return X, tf.keras.utils.to_categorical(y * self.n_classes, num_classes=self.n_classes)
-        # np.array(list(map(np.argwhere, tf.keras.utils.to_categorical(y*self.n_classes, num_classes=self.n_classes))))
-
-
-# From
-# https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly
+        return X, y
