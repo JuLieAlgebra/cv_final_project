@@ -22,13 +22,13 @@ class DataGenerator(tf.keras.utils.Sequence):
 
     def __init__(
         self,
-        data_filenames: np.array,
+        data_IDs: np.array,
         labels: pd.Series,
         n_classes: int,
         batch_size: int = 64,
         dim: tuple = (32, 32, 5),
     ):
-        self.data_filenames = data_filenames
+        self.data_IDs = data_IDs
         self.labels = labels
         self.n_classes = n_classes
         self.dim = dim
@@ -39,23 +39,23 @@ class DataGenerator(tf.keras.utils.Sequence):
 
     def get_batch(self):
         """Generating upon initalization, so we can keep things thread-safe for multiprocessing"""
-        shuffled = np.random.choice(self.data_filenames, len(self.data_filenames), replace=False)
         batch = {}
-        num_batches = len(self.data_filenames) // self.batch_size
+        num_batches = len(self.data_IDs) // self.batch_size
+        print("Leftover: ", len(self.data_IDs) % self.batch_size)
         j = 1
-        for i in range(0, num_batches):
-            batch[i] = shuffled[i * self.batch_size : j * self.batch_size]
+        for i in range(num_batches):
+            batch[i] = self.data_IDs[i * self.batch_size : j * self.batch_size]
             j += 1
 
         return batch
 
     def get_indices(self):
         """Returns indices for __getitem__"""
-        return np.arange(len(self.data_filenames) // self.batch_size)
+        return np.arange(len(self.data_IDs) // self.batch_size)
 
     def __len__(self):
         """Number of batches per epoch"""
-        return len(self.data_filenames) // self.batch_size
+        return len(self.data_IDs) // self.batch_size
 
     def __getitem__(self, index):
         """Generate one batch of data"""
@@ -66,19 +66,13 @@ class DataGenerator(tf.keras.utils.Sequence):
 
     def on_epoch_end(self):
         """Updates indexes with shuffle after each epoch"""
-        print(
-            "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\
-               Calling on_epoch_end in DataGenerator \n\
-               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        )
-        if self.shuffle == True:
+        if self.shuffle:
             np.random.shuffle(self.indexes)
 
     def _data_generation(self, batch):
         """
         From file names for a batch, generate the data.
         """
-        # print("Is this getting called??")
         X = np.zeros((self.batch_size, *self.dim))
         y = np.zeros((self.batch_size))
 
@@ -86,11 +80,12 @@ class DataGenerator(tf.keras.utils.Sequence):
         for i, ID in enumerate(batch):
             x = glob.glob("data/processed/" + str(ID) + "-*.npy")[0]
             # print(x)
-            X[i] = np.load(os.path.join(abs_path, "..", x)).T
+            X[i] = np.transpose(np.load(os.path.join(abs_path, "..", x)), (1, 2, 0))
 
-            # small bug here from how I've integrated the model architecture from Pasquet.
+            # ID is not entirely unique in the csv, so occasionally I get one objID with two spectroscopic redshifts
+            # I decided to handle this by averaging the estimates (it's always two)
             if type(self.labels[ID]) == pd.Series:
-                y[i] = self.labels[ID].values[0]
+                y[i] = np.mean(self.labels[ID].values)
             else:
                 y[i] = self.labels[ID]
 

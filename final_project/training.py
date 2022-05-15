@@ -40,16 +40,20 @@ class TrainModel(luigi.Task):
     :param seed: int - specified via config file
     """
 
+    __version__ = "0.1.0"
+
     # Two config files to avoid code changes
     conf_name = OmegaConf.load(join(abs_path, "conf", "train_configs.yaml"))["conf_to_use"]
     params = OmegaConf.load(join(abs_path, "conf", conf_name))
+    print(conf_name, params)
 
     # some repeated code in order to have the parameters become part of the salt
     batch_size = luigi.Parameter(default=params["batch_size"])
     test_split = luigi.Parameter(default=params["test_split"])  # fraction of data to be in test set
     num_classes = luigi.Parameter(default=params["num_classes"])
     lr = luigi.Parameter(default=params["lr"])
-    seed = luigi.Parameter(default=params["random_seed"])
+    seed = luigi.Parameter(default=params["seed"])
+    epochs = luigi.Parameter(default=params["epochs"])
     # input image shape isn't loaded here because the modifiable thing, the individual image shape, is
     # already affecting the salt for PreProcessing
 
@@ -57,11 +61,26 @@ class TrainModel(luigi.Task):
         """The 'I'm done' success file will be the trained model"""
         return luigi.LocalTarget(join(abs_path, "..", "data", "models", f"_SUCCESS-{salted.get_salted_version(self)}"))
 
+    def cleaned_params(self, params):
+        """ """
+        params["input_img_shape"] = (64, 32, 32, 5)
+        params["seed"] = int(params["seed"])
+        params["batch_size"] = int(params["batch_size"])
+        params["test_split"] = float(params["test_split"])
+        params["num_classes"] = int(params["num_classes"])
+        params["lr"] = float(params["lr"])
+        params["seed"] = int(params["seed"])
+        params["epochs"] = int(params["epochs"])
+        print(params)
+        return params
+
     def run(self) -> None:
         """Handles kicking off model training and writing success files/final model file"""
-        self.model = InceptionModel(**self.params)
+        self.model = InceptionModel(**self.cleaned_params(self.params))
         history = self.model.train(
-            checkpoint_path=join(abs_path, "..", "data", "models", f"checkpoint-{salted.get_salted_version(self)}")
+            checkpoint_path=join(abs_path, "..", "data", "models", f"checkpoint-{salted.get_salted_version(self)}"),
+            history_path=join(abs_path, "..", "data", "models", f"history-{salted.get_salted_version(self)}"),
+            epochs=self.epochs,  # though note that we are using early stopping
         )
 
         self.model.model.save(join(abs_path, "..", "data", "models", f"model-{salted.get_salted_version(self)}"))
