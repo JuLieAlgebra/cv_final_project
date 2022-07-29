@@ -17,7 +17,7 @@ abs_path = os.path.dirname(__file__)
 
 
 class FailedImageCheck(OSError):
-    """ """
+    """Custom error if things went unexpectedly wrong with the image downloading process"""
 
     pass
 
@@ -147,7 +147,7 @@ class ImageDownloader(luigi.Task):
         try:
             # If file already exists, don't download
             if os.path.exists(join("data", "images", f"{file_name}")):
-                print("Skipping!!", file_name)
+                print(file_name + ": already exists on disk, skipping download")
                 yield file_name
 
             else:
@@ -163,8 +163,7 @@ class ImageDownloader(luigi.Task):
 
             if not os.path.exists(join("data", "images", f"{file_name}")):
                 # didn't download, try again
-                # TODO need to write a breakout for this recursion in case it just
-                #      can't do it
+                # TODO need to write a breakout for this recursion in just in case
                 print("Trying again")
                 cls.download(url)
 
