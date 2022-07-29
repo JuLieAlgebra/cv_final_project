@@ -14,19 +14,20 @@
 <!-- [![Imports with isort](https://img.shields.io/badge/%20imports-isort-%231674b1)](https://pycqa.github.io/isort/) -->
 <!-- [![License](https://img.shields.io/github/license/fpgmaas/cookiecutter-poetry-example)](https://img.shields.io/github/license/fpgmaas/cookiecutter-poetry-example)
  -->
-Photometric redshift pipeline with, primarily, luigi and tensorflow. See docs link on the right for a more descriptive overview.
+Photometric redshift pipeline with, primarily, luigi and tensorflow. See docs link on the right for a more descriptive overview. Currently refactoring with [poetry](https://python-poetry.org/) and some different design choices.
 
-Note: For downloading the tabular data, I recommend adding a `.env` file with your AWS secrets like so:
-``AWS_ACCESS_KEY_ID=something``
+Note: For downloading the tabular data, I recommend adding a `.env` file with your AWS secrets like so: \
+``AWS_ACCESS_KEY_ID=something`` \
 ``AWS_SECRET_ACCESS_KEY=something``
 
 The downloaded tabular data is 2.9MB.
 
-However, you can also download the file here (preserve the file name or make sure that final_project/conf/aws_paths.yaml tabular_data entry matches the file name you chose): https://drive.google.com/file/d/1w1n8mihtWPwObA3JLvreH0BHdki3_y92/view?usp=sharing If you place the file into a folder called 'data' off the main directory of the repo, it will run without trying to download the file from AWS.
+However, you can also download the file [here](https://drive.google.com/file/d/1w1n8mihtWPwObA3JLvreH0BHdki3_y92/view?usp=sharing) (preserve the file name or make sure that final_project/conf/aws_paths.yaml tabular_data entry matches the file name you chose). \
+If you place the file into a folder called 'data' off the main directory of the repo, it will run without trying to download the file from AWS.
 
 The SQL query used to grab the data via CasJobs:
 ```sql
-SELECT TOP 20000
+SELECT TOP YOUR_LIMIT_HERE #(10000 for the google drive copy)
   za.specObjID, za.bestObjID, za.class, za.subClass, za.z, za.zErr,
   po.objID, po.type, po.flags, po.ra, po.dec,
   po.run, po.rerun, po.camcol, po.field,
