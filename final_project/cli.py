@@ -26,7 +26,7 @@ def main():
     tasks = [preprocessing.Preprocessing(lower=i[0], upper=i[1]) for i in ranges]
 
     luigi.build(
-        tasks,  # .append(training.TrainModel()),
+        tasks,
         local_scheduler=True,
         workers=n_workers,
     )

@@ -183,8 +183,9 @@ class BaseModel:
         return tf.square(tf.subtract(true, tf.reduce_sum(tf.multiply(self.bin_values, pred))))
 
     @cached_property
-    def bin_values(self):
-        """returns array with the same length as the number of classes, with the midpoint of the start and end range
+    def bin_values(self) -> np.array:
+        """
+        Returns array with the same length as the number of classes, with the midpoint of the start and end range
         stored (ie, the bin containing redshift values 0 to 0.2 will have bin value 0.1)
         """
         max_val = 0.4  # since 0.39.. is the max redshift value that we see
@@ -246,9 +247,6 @@ class InceptionModel(BaseModel):
 
         # Inception Layer 3
         inception_layer3_out = self.add_inception_layer(pooling_layer2_out, 92, 128)
-
-        # # # Inception Layer 4
-        # inception_layer4_out = self.add_inception_layer(inception_layer3_out, 92, 128)
 
         # Pooling Layer 3
         pooling_layer3 = AveragePooling2D(pool_size=(2, 2), strides=2, padding="same")
