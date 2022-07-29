@@ -10,18 +10,8 @@ from final_project import data_downloader
 
 
 class DownloaderTests(TestCase):
-    def test_downloader(self):
-        """TODO"""
-        d = data_downloader.URLgenerator()
-        # print(d)
-        # luigi.build([data_downloader.URLgenerator()], local_scheduler=True)
-
-    def test_check_urls(self, n_urls=25385):
-        """Need to adjust, there won't be 50000 unique urls, only 25385"""
-        urls = np.genfromtxt("data/urls.txt", dtype=str)
-        assert np.unique(urls).shape[0] == n_urls
-
     def test_check_downloaded(self):
+        """ Ensure that what was not downloaded once is now downloaded. """
         not_downloaded = "data/not_downloaded.txt"
         with open("data/urls.txt", mode="r") as urls, open(not_downloaded, mode="w") as missing:
             for url in urls:
@@ -31,11 +21,13 @@ class DownloaderTests(TestCase):
         print("Done")
 
     def test_check_corrupted(self, check=10):
-        """Using astropy's file checking to make sure the files didn't
+        """
+        Using astropy's file checking to make sure the files didn't
         get corrupted.
         TODO removed hard coded paths here.
 
-        This will take 8 hours to check every single file, so I randomly check (no set seed) 10 files."""
+        This will take 8 hours to check every single file, so I randomly check (no set seed) 10 files.
+        """
         urls = np.genfromtxt("data/urls.txt", dtype=str)
         to_check = np.random.choice(urls, size=check, replace=False)
         checked = {}
@@ -48,12 +40,14 @@ class DownloaderTests(TestCase):
                         checked[file_name] = True
 
     def test_tabular(self):
-        """Need to do this to check what's not in the tabular ...
-        Maybe need to join the urls with the dataframe from tabular, have url be a part of the data"""
+        """
+        Need to do this to check what's not in the tabular ...
+        Maybe need to join the urls with the dataframe from tabular, have url be a part of the data
+        """
         not_downloaded = "data/not_downloaded.txt"
-        # with open("data/urls.txt", mode="r") as urls, open(not_downloaded, mode="w") as missing:
-        #     for url in urls:
-        #         file_name = url[-31:-1]
-        #         if not os.path.exists("data/images/" + file_name):
-        #             missing.write(url)
-        # print("Done")
+        with open("data/urls.txt", mode="r") as urls, open(not_downloaded, mode="w") as missing:
+            for url in urls:
+                file_name = url[-31:-1]
+                if not os.path.exists("data/images/" + file_name):
+                    missing.write(url)
+        print("Done")
