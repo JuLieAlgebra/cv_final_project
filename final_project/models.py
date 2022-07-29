@@ -38,27 +38,6 @@ join = os.path.join  # for my own sanity
 ###################
 
 
-# def data_augmentation(file_names: str, seed: int = 0):
-#     """Ughhh. Would be really annoying to re-write the rest of the code for grabbing the labels...
-
-#     Ok. what would need to change? Could I remove all the salts and start from there?
-#     Or add more logic to data generator and partition? Feel like I'd want to just check if the next thing
-#     was an '-R' and then I should still keep it.
-
-#     Or generate a whole new processed folder with one zero rotation and one random rotation for each object.
-
-#     I would need to re-write how I grab the labels for each object.
-
-#     """
-#     np.random.seed(seed)
-#     for f in file_names:
-#         X = np.load(f)
-#         # normalize my inputs as well.
-#         num_rot = np.random.choice([1, 2, 3], 1)  # decide to rotate image 90, 180, or 270 degrees
-#         rot = np.rot90(X, k=num_rot, axes=(1, 2)).copy()
-#         rot.save(f"{f[-4:]}-R{num_rot}.npy")
-
-
 def data_stats() -> tuple:
     """Compute statistics for dataset"""
     file_names = glob.glob("data/processed/*.npy")

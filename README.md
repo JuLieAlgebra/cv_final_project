@@ -2,7 +2,7 @@
 
 <!-- [![Release](https://img.shields.io/github/v/release/fpgmaas/cookiecutter-poetry-example)](https://img.shields.io/github/v/release/fpgmaas/cookiecutter-poetry-example) -->
 
-[![Build status](https://github.com/JuLieAlgebra/photometric_redshift/actions/workflows/testing.yml/badge.svg?branch=master)](https://github.com/JuLieAlgebra/photometric_redshift/actions/workflows/testing.yml)
+<!-- [![Build status](https://github.com/JuLieAlgebra/photometric_redshift/actions/workflows/testing.yml/badge.svg?branch=master)](https://github.com/JuLieAlgebra/photometric_redshift/actions/workflows/testing.yml) -->
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/927273e266d47d404488/maintainability)](https://codeclimate.com/github/JuLieAlgebra/final_project/maintainability)
 
@@ -47,4 +47,3 @@ WHERE
     and ((po.petroMag_r - po.extinction_r) <= 17.8)
 ORDER BY RAND(10);
 ```
-Credit goes to Pasquet et al, 2018 for the query, only made minor modifications to theirs.

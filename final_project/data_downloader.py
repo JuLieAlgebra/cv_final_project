@@ -88,7 +88,8 @@ class URLgenerator(luigi.Task):
         for i, row in df.iterrows():
             for band in bands:
                 urls.append(
-                    f"https://data.sdss.org/sas/dr17/eboss/photoObj/frames/{row.rerun}/{row.run}/{row.camcol}/frame-{band}-{str(row.run).zfill(6)}-{row.camcol}-{str(row.field).zfill(4)}.fits.bz2\n"
+                    f"https://data.sdss.org/sas/dr17/eboss/photoObj/frames/{row.rerun}/{row.run}/{row.camcol}/frame-{band}-\
+                    {str(row.run).zfill(6)}-{row.camcol}-{str(row.field).zfill(4)}.fits.bz2\n"
                 )
         print("Success: Generated URLs")
 
@@ -156,21 +157,6 @@ class ImageDownloader(luigi.Task):
                 os.system(f"mv data/images/{tmp} data/images/{file_name}")
                 yield file_name
         finally:
-            # This is messy to leave here, but I wanted to illustrate my thought process
-            # This does check that the file isn't corrupted, which becomes a problem in the
-            # pre-processing steps, but the data checking does take hours to run. I modified this
-            # idea into a random check of a dozen files as part of my testing pipeline (which is not
-            # designed for CI)
-
-            # # If it doesn't exist, then something went wrong downloading and we're
-            # # going to delete the temp.
-            # if os.path.exists(join("data", "images", f"{file_name}")):
-            #     # check image
-            #     if cls.bad_file(file_name):
-            #         os.remove(join("data", "images", f"{file_name}"))
-            #         print("Got a bad one: ", file_name)
-            #         cls.download(url)
-
             # Cleanup, if tmp still exists
             if os.path.exists(tmp):
                 os.remove(tmp)

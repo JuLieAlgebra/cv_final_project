@@ -15,9 +15,6 @@ class DataGenerator(tf.keras.utils.Sequence):
     """
     Generator for Keras training to allow multiprocessing and training on batches with only the
     batch itself being loaded into memory.
-
-    This implementation was heavily inspired by various examples for creating data generators
-    for keras, namely https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly.
     """
 
     def __init__(
@@ -83,7 +80,7 @@ class DataGenerator(tf.keras.utils.Sequence):
             X[i] = np.transpose(np.load(os.path.join(abs_path, "..", x)), (1, 2, 0))
 
             # ID is not entirely unique in the csv, so occasionally I get one objID with two spectroscopic redshifts
-            # I decided to handle this by averaging the estimates (it's always two)
+            # I decided to handle this by averaging the estimates
             if type(self.labels[ID]) == pd.Series:
                 y[i] = np.mean(self.labels[ID].values)
             else:
